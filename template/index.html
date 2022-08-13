@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee TODO List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="mt-5">{{ .PageTitle }}</h1>
+    <div class="my-2">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">Tambah</button>
+    </div>
+    <table id="table_id" class="display">
+      <thead>
+          <tr>
+            <th>Todo</th>
+            <th>Assignee</th>
+            <th>Deadline</th>
+            <th>Action</th>
+          </tr>
+      </thead>
+      <tbody>
+        {{ range.Todos }}
+          <tr>
+            <td width="50%">{{ .Title }}</td>
+            <td>{{ .Assignee }}</td>
+            <td>{{ .Deadline }}</td>
+            <td>
+              {{ if.Done}}
+              {{ else }}
+                <a href="/done/{{ .ID }}" class="btn btn-info set-done">Mark as Done</a>
+                <button class="btn btn-warning edit" data-id="{{ .ID }}" data-todo="{{ .Title }}" data-assignee="{{ .Assignee }}" data-deadline="{{ .Deadline }}">Edit</button>
+              {{ end }}
+                <a href="/delete/{{ .ID }}" class="btn btn-danger delete">Delete</a>
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+  </table>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade" id="tambahModal" tabindex="-1" aria-labelledby="tambahModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tambahModalLabel">Tambah Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="" method="POST">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="todo" class="form-label">Todo</label>
+              <input type="text" class="form-control" id="todo" name="todo">
+            </div>
+            <div class="mb-3">
+              <label for="assignee" class="form-label">Assignee</label>
+              <input type="text" class="form-control" id="assignee" name="assignee">
+            </div>
+            <div class="mb-3">
+              <label for="deadline" class="form-label">Deadline</label>
+              <input type="datetime-local" class="form-control" id="deadline" name="deadline">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Tambah</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="" id="formEdit" method="POST">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="editTodo" class="form-label">Todo</label>
+              <input type="text" class="form-control" id="editTodo" name="editTodo">
+            </div>
+            <div class="mb-3">
+              <label for="editAssignee" class="form-label">Assignee</label>
+              <input type="text" class="form-control" id="editAssignee" name="editAssignee">
+            </div>
+            <div class="mb-3">
+              <label for="editDeadline" class="form-label">Deadline</label>
+              <input type="datetime-local" class="form-control" id="editDeadline" name="editDeadline">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="http://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      var editModal = new bootstrap.Modal(document.getElementById("editModal"), {});
+        $('#table_id').DataTable();
+        $('#table_id').on('click', '.edit', function(){
+          editModal.show();
+          console.log($(this).data('id'));
+          $('#editTodo').val($(this).data("todo"))
+          $('#editAssignee').val($(this).data("assignee"))
+          $('#editDeadline').val($(this).data("deadline"))
+          $('#formEdit').attr('action', '/edit/' + $(this).data('id'))
+        })
+    });
+  </script>
+</body>
+</html>
